@@ -1,0 +1,49 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<div class="container"> 
+<form id="new-post">
+	<div class="col-md-5" >
+		<div class="form-group">
+	  		<label for="username" class="col-form-label">Gebruikersnaam</label>
+	  		<input class="form-control" type="text" name="name">
+		</div>
+		<div class="form-group">
+	  		<label for="password" class="col-form-label">Wachtwoord</label>
+    		<input class="form-control" type="password" name="password">
+		</div>
+	</div>
+	<div class="col-md-7" >
+		<div class="form-group">
+	  		<label for="title" class="col-form-label">Titel</label>
+    		<input class="form-control" type="text" name="title">
+		</div>
+		<div class="form-group">
+    		<label for="message">Bericht</label>
+    		<textarea class="form-control" name="message" rows="3"></textarea>
+  		</div>
+  	</div><button type="submit" class="btn btn-primary float-right">Submit</button>
+  	</form>
+  	<br />
+		<table class="table">
+			<thead>
+				<tr> 
+					<th>Onderwerp</th>
+					<th>Aangemaakt door</th>
+					<th>Geplaatst op</th>
+				</tr>
+			</thead>
+			<tbody>
+			{% for post in posts %}
+			<tr>
+        		<td><a href="/post/{{ post.id }}">{{ post.title }}</td>
+        		<td><a href="/author/{{ post.author_id }}">{{ post.name }}</td>
+        		<td>{{ post.created_at }}</td>
+        	</tr>
+    		{% endfor %}
+				<tr>
+				</tr>
+			</tbody>
+		</table>  
+	</div>
+{% endblock %}

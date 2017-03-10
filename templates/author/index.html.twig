@@ -1,0 +1,26 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <div class="container"> 
+		<table class="table">
+			<thead>
+				<tr> 
+					<th>Naam</th>
+					<th>Aantal berichten</th>
+					<th>Gemaakt op</th>
+				</tr>
+			</thead>
+			<tbody>
+			{% for author in authors %}
+			<tr>
+        		<td><a href="/author/{{ author.id }}">{{ author.name }}</td>
+        		<td>{{ author.count }}</td>
+        		<td>{{ author.created_at }}</td>
+        	</tr>
+    		{% endfor %}
+				<tr>
+				</tr>
+			</tbody>
+		</table>  
+	</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <div class="container"> 
+		<table class="table">
+			<thead>
+				<tr> 
+					<th>Onderwerp</th>
+					<th>{{ post.title }}</th>
+				</tr>
+			</thead>
+			<tbody>
+			<tr>
+        		<td>{{ post.name }}<br />{{ post.created_at }}</td>
+        		<td>{{ post.text }}</td>
+        	</tr>
+			</tbody>
+		</table>  
+	</div>
+{% endblock %}

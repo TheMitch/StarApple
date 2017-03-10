@@ -16,3 +16,13 @@ $app->register(new MonologServiceProvider(), array(
 $app->register(new WebProfilerServiceProvider(), array(
     'profiler.cache_dir' => __DIR__.'/../var/cache/profiler',
 ));
+
+$app->register(new Silex\Provider\DoctrineServiceProvider(), array(
+    'db.options'	=> array(
+        'driver'	=> 'pdo_mysql',
+        'dbname'	=> 'starapple',
+        'host' 		=> '127.0.0.1', 
+        'password' 	=> ''
+
+    ),
+));
