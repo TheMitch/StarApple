@@ -11,9 +11,10 @@ class PostControllerProvider implements ControllerProviderInterface
 	{
 		$controllers = $app['controllers_factory'];
 
-		$controllers->post('/create', 'App\Controller\PostController::createAction');	
+		$controllers->post('/create', 'App\Controller\PostController::createAJAXAction');	
 		$controllers->match('/', 'App\Controller\PostController::indexAction');		
-		$controllers->match('/{id}', 'App\Controller\PostController::readAction');	
+		$controllers->match('/{id}', 'App\Controller\PostController::readAction')
+			->assert('id', '[0-9]+');	
 		
         return $controllers;
 	}

@@ -25,25 +25,6 @@
   	</div><button type="submit" class="btn btn-primary float-right">Submit</button>
   	</form>
   	<br />
-		<table class="table">
-			<thead>
-				<tr> 
-					<th>Onderwerp</th>
-					<th>Aangemaakt door</th>
-					<th>Geplaatst op</th>
-				</tr>
-			</thead>
-			<tbody>
-			{% for post in posts %}
-			<tr>
-        		<td><a href="/post/{{ post.id }}">{{ post.title }}</td>
-        		<td><a href="/author/{{ post.author_id }}">{{ post.name }}</td>
-        		<td>{{ post.created_at }}</td>
-        	</tr>
-    		{% endfor %}
-				<tr>
-				</tr>
-			</tbody>
-		</table>  
+  		{% include 'post/_posts_table.html.twig' %}
 	</div>
 {% endblock %}

@@ -11,7 +11,7 @@
 			</thead>
 			<tbody>
 			<tr>
-        		<td>{{ post.name }}<br />{{ post.created_at }}</td>
+        		<td><a href="/author/{{ post.author_id }}">{{ post.name }} </a><br />{{ post.created_at }}</td>
         		<td>{{ post.text }}</td>
         	</tr>
 			</tbody>

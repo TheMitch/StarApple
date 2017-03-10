@@ -12,7 +12,8 @@ class AuthorControllerProvider implements ControllerProviderInterface
 		$controllers = $app['controllers_factory'];
 
 		$controllers->match('/', 'App\Controller\AuthorController::indexAction');		
-		$controllers->match('/{id}', 'App\Controller\AuthorController::readAction');
+		$controllers->match('/{id}', 'App\Controller\AuthorController::readAction')
+			->assert('id', '[0-9]+');
 		
         return $controllers;
 	}

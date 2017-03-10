@@ -3,107 +3,66 @@
 namespace App\Controller;
 
 use Silex\Application;
-use Doctrine\DBAL\DriverManager;
-use Sumpfony\Component\HttpFoundation\Request;
-use Sumpfony\Component\HttpFoundation\Response;
+use App\Model\Post;
+use App\Model\Author;
 
 class PostController 
 {
 
 	public function indexAction(Application $app)
 	{
-		$query = $app['db']->createQueryBuilder();
-		$query
-    	->select('p.id', 'p.author_id', 'p.title', 'p.text', 'a.name', 'p.created_at')
-    	->from('posts', 'p')
-    	->innerJoin('p', 'authors', 'a', 'p.author_id = a.id')
-      ->orderBy('p.created_at', 'DESC');
-
-   	$posts = $query->execute();
+    $posts = Post::findAll($app);
 		return $app['twig']->render('post\index.html.twig', array( 'posts' => $posts,));
 	}
 
 	public function readAction(Application $app, $id)
 	{
-		$query = $app['db']->createQueryBuilder();
-		$query
-    	->select('p.id', 'p.author_id', 'p.title', 'p.text', 'a.name', 'p.created_at')
-    	->from('posts', 'p')
-      	->where('p.id = :id')
-      	->setParameter(':id', $id)
-    	->innerJoin('p', 'authors', 'a', 'p.author_id = a.id');
-
-   		$posts = $query->execute();    	
-   		$post = $posts->fetch();
+    $post = Post::find($app, $id);
 		return $app['twig']->render('post\read.html.twig', array( 'post' => $post,	));
 	}
 
-	public function createAction(Application $app){	
-    // Lacking an orm system so we'll store the data here	
-		$request = $app['request_stack']->getCurrentRequest()->request;
-    $name = $request->get("name");
-    $password = password_hash($request->get("password"), PASSWORD_DEFAULT);
-    $title = $request->get("title");
-    $message = $request->get("message");
-    $created_at = date("Y-m-d H:i:s");
+	public function createAJAXAction(Application $app){	
+    $request = $app['request_stack']->getCurrentRequest()->request;
+    $dateTime = date("Y-m-d H:i:s");    
 
-    // Checking if there is an author with the specified name
-		$query = $app['db']->createQueryBuilder();
-		$query
-    	->select('a.id', 'a.password')
-    	->from('authors', 'a')
-      	->where('name = :name')
-      	->setParameters(array('name'=> $name));
-   		$results = $query->execute();   
-   		$result = $results->fetch();
-      $author_id = $result['id'];
+    $post = new Post();
+    $post->title = $request->get("title");
+    $post->text = $request->get("message");
+    $post->created_at = $dateTime;
 
-    // Does the password match up with the specified author
-   		if($result){
-        if(!password_verify ( $request->get("password") , $result['password'] )){
-          $response = array(
-            "notifications" => array(
-              "error" => "Gegevens incorrect",
-              )
+    $author = new Author();
+    $author->name = $request->get("name");
+    $author->password = $request->get("password");
+    $author->created_at = $dateTime;
+
+    if(!$author->authenticate($app)){
+      if($author->save($app)){
+        $response["notifications"][] =  array(
+             "type" => "info",
+             "message" => "Nieuw account aangemaakt!",
+        );      
+      } else { 
+        $response["notifications"][] =  array(
+          "type" => "danger",
+          "message" => "Gegevens incorrect",
           );
-          die(json_encode($response));  // need to update this; echo and return gives a 500 error
-        }
-      } 
-      // Create author if the name is not known in the db
-      if(!$author_id){
-        $query = $app['db']->createQueryBuilder();
-        $query->values(
-          array(
-            "name" => "'".$name."'",
-            "password" => "'".$password."'",
-            "created_at" => "'".$created_at."'",
-          )
-        )
-        ->insert('authors');
-        $query->execute();
-        $author_id = $app['db']->lastInsertId();
+        return $app->json($response, 200);
       }
+    }
+    $post->author = $author;
+    $post->save($app);
 
-      // Create post
-        $query = $app['db']->createQueryBuilder();
-        $query->values(
-          array(
-            "author_id" => "'".$author_id."'",
-            "title" => "'".$title."'",
-            "text" => "'".$message."'",
-            "created_at" => "'".$created_at."'",
-          )
-        )
-        ->insert('posts');
-        $query->execute();
-        $response = array(
-          "id" => $app['db']->lastInsertId(),
-          "author_id" => $result['id'],
-          "name" => $name,
-          "title" => $title,
-          "text" => $message,
-          "created_at" => $created_at,
-          );
-      die(json_encode($response));  // need to update this; echo and return gives a 500 error
+    $response["id"] = $post->id;
+    $response["author_id"] = $post->author->id;
+    $response["name"] = $post->author->name;
+    $response["title"] = $post->title;
+    $response["text"] = $post->text;
+    $response["created_at"] = $post->created_at;
+    $response["notifications"][] =  array(
+      "type" => "success",
+      "message" => "Nieuwe post geplaatst!",
+    );
+
+      return $app->json($response, 201);
 	}
 }
